@@ -1,0 +1,41 @@
+server:
+  port: 9016
+  tomcat:
+    max-threads: 500
+  max-http-header-size: 4048576
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: mybatis-service
+          uri: lb://mybatis-service
+          predicates:
+            - Path=/mybatis-service/**
+          filters:
+            - StripPrefix=1
+        - id: order-manager-service
+          uri: lb://order-manager-service
+          predicates:
+            - Path=/order-manager-service/**
+          filters:
+            - StripPrefix=1
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+logging:
+  level:
+    org.springframework.cloud.sleuth: debug
